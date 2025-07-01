@@ -7,17 +7,33 @@ POKEMON_CHANNEL = int(os.environ['POKEMON_CHANNEL'])
 DISCORD_BOT_TOKEN = os.environ['DISCORD_BOT_TOKEN']
 EMOJIS = ['❤️', '💖', '💗', '💓', '💕', '💞', '💘', '😍', '🥰', '😘', '😻']
 
-bot = commands.Bot(command_prefix='Nayeon ', bot=False)
+# Counter to track how many times the cronjob has executed.
+# After six executions, a different set of commands will be dispatched.
+execution_count = 0
+
+bot = commands.Bot(command_prefix='Ipe ', bot=False)
 
 @tasks.loop(hours=CRON_JOB_HOURS)
 async def cronjob1():
-    print('Cronjob 1 executed')
+    global execution_count
+    execution_count += 1
+    print(f'Cronjob 1 executed (count={execution_count})')
+
     channel = bot.get_channel(POKEMON_CHANNEL)
 
-    if channel is not None:
-        await channel.send('$p')
-    else:
+    if channel is None:
         print('Channel not found.')
+        return
+
+    # Every sixth execution, send the special commands instead of the default one.
+    if execution_count >= 6:
+        await channel.send('$arl')
+        # Brief delay to avoid rate-limit issues and preserve order.
+        await asyncio.sleep(1)
+        await channel.send('$p 25')
+        execution_count = 0  # Reset the counter after the special execution.
+    else:
+        await channel.send('$p')
 
 
 @bot.event
