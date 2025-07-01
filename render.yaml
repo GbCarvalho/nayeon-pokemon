@@ -1,0 +1,22 @@
+services:
+  - type: worker           # Background process (no web port needed)
+    name: nayeon-pokemon    # Friendly service name on Render
+    env: docker             # Use the repository's Dockerfile for the image
+    plan: free              # Change the plan if you need more resources
+
+    # Optional: override if your Dockerfile isn't at repository root
+    dockerfilePath: Dockerfile
+    dockerContext: .
+
+    # Environment variables required by the bot. Marked `sync: false` so you
+    # can set / update them securely in the Render dashboard without committing
+    # secrets to version control.
+    envVars:
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: POKEMON_CHANNEL
+        sync: false
+      - key: CRON_JOB_HOURS
+        sync: false
+      - key: SPECIFIED_USER_ID
+        sync: false
