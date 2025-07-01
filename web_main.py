@@ -1,6 +1,7 @@
 # FastAPI app that also runs the Discord bot inside the same event loop.
 
 import os, asyncio
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 # ---- Import bot instance and related logic from main.py ----
@@ -10,27 +11,24 @@ import main  # noqa: E402
 bot = main.bot
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Start the Discord bot when the application starts and clean it up on shutdown."""
+    bot_task = asyncio.create_task(bot.start(os.environ["DISCORD_BOT_TOKEN"]))
+    try:
+        yield
+    finally:
+        # Gracefully close the bot and wait for the task to finish
+        await bot.close()
+        await bot_task
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
 async def health():
     return {"ok": True}
-
-
-# Start the Discord bot when the FastAPI application starts, and close it on
-# shutdown. This keeps everything within Uvicorn's event loop and avoids
-# warnings about un-awaited coroutines.
-
-
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(bot.start(os.environ["DISCORD_BOT_TOKEN"]))
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await bot.close()
 
 
 # When executed directly (`python web_main.py`), run Uvicorn.
