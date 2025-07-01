@@ -1,10 +1,17 @@
 from discord.ext import commands, tasks
 import os, random, asyncio
 
-SPECIFIED_USER_ID = int(os.environ['SPECIFIED_USER_ID'])
-CRON_JOB_HOURS = int(os.environ['CRON_JOB_HOURS'])
-POKEMON_CHANNEL = int(os.environ['POKEMON_CHANNEL'])
-DISCORD_BOT_TOKEN = os.environ['DISCORD_BOT_TOKEN']
+SPECIFIED_USER_ID = int(os.getenv("SPECIFIED_USER_ID", "0"))
+CRON_JOB_HOURS = int(os.getenv("CRON_JOB_HOURS", "1"))
+POKEMON_CHANNEL = int(os.getenv("POKEMON_CHANNEL"))
+DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+
+if not DISCORD_BOT_TOKEN:
+    raise RuntimeError("DISCORD_BOT_TOKEN is required")
+
+if not POKEMON_CHANNEL:
+    raise RuntimeError("POKEMON_CHANNEL is required")
+
 EMOJIS = ['❤️', '💖', '💗', '💓', '💕', '💞', '💘', '😍', '🥰', '😘', '😻']
 
 # Counter to track how many times the cronjob has executed.
