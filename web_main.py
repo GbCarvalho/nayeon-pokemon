@@ -2,7 +2,7 @@
 
 import os, asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 # ---- Import bot instance and related logic from main.py ----
 # Importing `main` sets up the bot, cronjob, and event handlers without starting it.
@@ -29,6 +29,12 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/")
 async def health():
     return {"ok": True}
+
+
+# Explicit HEAD endpoint so external pingers issuing HEAD requests receive 200.
+@app.head("/")
+async def health_head() -> Response:
+    return Response(status_code=200)
 
 
 # When executed directly (`python web_main.py`), run Uvicorn.
