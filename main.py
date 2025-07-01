@@ -58,4 +58,7 @@ async def ping(ctx):
     await ctx.send('pong')
 
 
-bot.run(DISCORD_BOT_TOKEN)
+# When executed directly (e.g. `python main.py`), run the bot as a standalone
+# background process without a web server.
+if __name__ == "__main__":
+    bot.run(DISCORD_BOT_TOKEN)
