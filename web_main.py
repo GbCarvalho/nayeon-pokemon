@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # make the existing event loop re-entrant for FastAPI + discord.py
     nest_asyncio.apply()
     loop = asyncio.get_event_loop()
-    loop.create_task(run_bot())
+    asyncio.create_task(run_bot())
 
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8080")))
