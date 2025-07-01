@@ -33,7 +33,9 @@ async def cronjob1():
         return
 
     # Every sixth execution, send the special commands instead of the default one.
-    if execution_count >= 6:
+    if execution_count >= 3:
+        await channel.send('$p')
+        await asyncio.sleep(1)
         await channel.send('$arl')
         # Brief delay to avoid rate-limit issues and preserve order.
         await asyncio.sleep(1)
